@@ -1,6 +1,7 @@
 package com.tao.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tao.common.R;
 import com.tao.pojo.Employee;
 import com.tao.service.EmployeeService;
@@ -8,10 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -89,4 +88,23 @@ public class EmployeeController {
         return R.success("新增员工成功");
     }
 
+
+    //分页查询
+    @GetMapping("/page")
+    public R<Page> page(int page,int pageSize,String name){
+
+        //分页构造器
+        Page pageinfo = new Page(page,pageSize);
+
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
+        //过滤条件
+        queryWrapper.like(StringUtils.hasText(name),Employee::getName,name);
+        //排序条件
+        queryWrapper.orderByDesc(Employee::getUpdateTime);
+
+        //查询
+        employeeService.page(pageinfo,queryWrapper);
+
+        return R.success(pageinfo);
+    }
 }
