@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tao.common.R;
 import com.tao.pojo.Category;
-import com.tao.pojo.Employee;
 import com.tao.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("category")
@@ -43,7 +43,23 @@ public class CategoryController {
 
     @DeleteMapping
     public R<String> delete(Long ids){
-        categoryService.removeById(ids);
+        categoryService.remove(ids);
+//        categoryService.removeById(ids);
         return R.success("删除成功");
+    }
+
+    //根据id修改分类信息
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category){
+        //条件构造器
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(category.getType() != null,Category::getType,category.getType());
+        //排序条件
+        queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+
+        List<Category> list= categoryService.list(queryWrapper);
+
+        return R.success(list);
+
     }
 }

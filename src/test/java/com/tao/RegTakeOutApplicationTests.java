@@ -7,7 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 class RegTakeOutApplicationTests {
 
     @Test
-    void contextLoads() {
+    public void testUpload(){
+//        String fileName = "eee,jpg";
+//        String suffix = fileName.substring(fileName.lastIndexOf("."));
+//        System.out.println(suffix);
     }
-
 }
