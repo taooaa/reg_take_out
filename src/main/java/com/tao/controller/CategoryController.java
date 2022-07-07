@@ -41,6 +41,7 @@ public class CategoryController {
         return R.success(pageInfo);
     }
 
+    //删除套餐
     @DeleteMapping
     public R<String> delete(Long ids){
         categoryService.remove(ids);
