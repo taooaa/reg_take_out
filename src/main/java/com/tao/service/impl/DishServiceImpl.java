@@ -9,8 +9,10 @@ import com.tao.mapper.DishMapper;
 import com.tao.pojo.Dish;
 import com.tao.pojo.DishFlavor;
 import com.tao.pojo.Setmeal;
+import com.tao.pojo.SetmealDish;
 import com.tao.service.DishFlavorService;
 import com.tao.service.DishService;
+import com.tao.service.SetmealDishService;
 import javafx.css.Styleable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     private DishFlavorService dishFlavorService;
     @Autowired
     private DishService dishService;
+    @Autowired
+    private SetmealDishService setmealDishService;
 
     //新增菜品，同时保存对应的口味数据
     @Override
@@ -87,9 +91,39 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishFlavorService.saveBatch(flavors);
     }
 
+    //删除菜品和关系表数据
     @Override
-    public void deleteWithFlavor(Long ids) {
+    @Transactional
+    public void deleteWithFlavor(List<Long> ids) {
+        //判断是否可以删除
+        //查询是否关联套餐，如果已经关联，抛出异常
+        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //添加查询条件
+        setmealDishLambdaQueryWrapper.in(SetmealDish::getDishId,ids);
+        int count1 = setmealDishService.count(setmealDishLambdaQueryWrapper);
 
+        if(count1>0){
+            //已经关联套餐，抛出异常
+            throw new CustomException("当前菜品已经关联套餐，不能能删除");
+
+        }
+        //如果没有关联，判断状态是否停售
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Dish::getId,ids);
+        queryWrapper.eq(Dish::getStatus,1);
+
+        int count = this.count(queryWrapper);
+        if (count>0){
+            throw new CustomException("菜品正在售卖，不可删除");
+        }
+
+        this.removeByIds(ids);
+
+        //删除关系表中数据
+        LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(DishFlavor::getDishId,ids);
+
+        dishFlavorService.remove(lambdaQueryWrapper);
     }
 
 }

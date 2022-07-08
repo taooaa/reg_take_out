@@ -49,7 +49,14 @@ public class CategoryController {
         return R.success("删除成功");
     }
 
-    //根据id修改分类信息
+    //根据id修改信息
+    @PutMapping
+    public R<String> update(@RequestBody Category category){
+        categoryService.updateById(category);
+        return R.success("修改分类信息成功");
+    }
+
+    //根据条件查询分类数据,回显修改页面数据
     @GetMapping("/list")
     public R<List<Category>> list(Category category){
         //条件构造器

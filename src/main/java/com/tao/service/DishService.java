@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.tao.dto.DishDto;
 import com.tao.pojo.Dish;
 
+import java.util.List;
+
 public interface DishService extends IService<Dish> {
     //新增菜品，操作两张表
     public void saveWithFlavor(DishDto dishDto);
@@ -15,5 +17,6 @@ public interface DishService extends IService<Dish> {
     public void updateWithFlavor(DishDto dishDto);
 
     //删除菜品
-    public void deleteWithFlavor(Long ids);
+    public void deleteWithFlavor(List<Long> ids);
+
 }

@@ -2,15 +2,15 @@ package com.tao.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tao.common.R;
 import com.tao.dto.DishDto;
-import com.tao.pojo.Category;
-import com.tao.pojo.Dish;
-import com.tao.pojo.Employee;
+import com.tao.pojo.*;
 import com.tao.service.CategoryService;
 import com.tao.service.DishFlavorService;
 import com.tao.service.DishService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("dish")
+@Slf4j
 public class DishController {
     @Autowired
     private DishService dishService;
@@ -93,11 +94,11 @@ public class DishController {
     }
 
     //删除菜品
-//    @DeleteMapping
-//    public R<String> delete(Long ids){
-//        dishService.deleteWithFlavor(ids);
-//        return R.success("删除菜品成功");
-//    }
+    @DeleteMapping
+    public R<String> delete(@RequestParam  List<Long> ids){
+        dishService.deleteWithFlavor(ids);
+        return R.success("删除菜品成功");
+    }
 
 
     //根据条件查询对应菜品数据
@@ -117,5 +118,24 @@ public class DishController {
         List<Dish> list = dishService.list(queryWrapper);
 
         return R.success(list);
+    }
+
+    //修改菜品起售停售状态
+    @PostMapping("/status/{status}")
+    public R<String> updateStatus(@PathVariable Integer status,@RequestParam List<Long> ids){
+        log.info("修改id为:{}",ids);
+
+//        //判断套餐起售状态
+//        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper();
+//        queryWrapper.in(Setmeal::getId,ids);
+//        queryWrapper.eq(Dish::getStatus)
+        Dish dish = new Dish();
+        for(Long dishId:ids) {
+            dish.setId(dishId);
+            dish.setStatus(status);
+            dishService.updateById(dish);
+        }
+
+        return R.success("修改成功");
     }
 }
