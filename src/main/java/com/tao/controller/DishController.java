@@ -93,9 +93,29 @@ public class DishController {
     }
 
     //删除菜品
-    @DeleteMapping
-    public R<String> delete(Long ids){
-        dishService.deleteWithFlavor(ids);
-        return R.success("删除菜品成功");
+//    @DeleteMapping
+//    public R<String> delete(Long ids){
+//        dishService.deleteWithFlavor(ids);
+//        return R.success("删除菜品成功");
+//    }
+
+
+    //根据条件查询对应菜品数据
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish){
+
+        //构造查询条件
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(dish.getCategoryId() != null,Dish::getCategoryId,dish.getCategoryId());
+
+        //只查询状态为1的，即起售状态的菜品
+        queryWrapper.eq(Dish::getStatus,1);
+        //排序条件
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(queryWrapper);
+
+        return R.success(list);
     }
 }
