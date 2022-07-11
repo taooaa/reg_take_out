@@ -12,6 +12,7 @@ import com.tao.pojo.SetmealDish;
 import com.tao.service.CategoryService;
 import com.tao.service.SetmealDishService;
 import com.tao.service.SetmealService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/setmeal")
+@Slf4j
 public class SetmealController {
     @Autowired
     private SetmealDishService setmealDishService;
@@ -142,6 +144,15 @@ public class SetmealController {
 
         return R.success(list);
 
+    }
+    //查看套餐
+    @GetMapping("/dish")
+    public R<String> view(Integer id){
+//        log.info();
+        return null;
+//        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.eq(Setmeal::getId,id);
+//        return R.success("查询成功");
     }
 
 }
