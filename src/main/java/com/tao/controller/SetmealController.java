@@ -151,7 +151,6 @@ public class SetmealController {
     }
     //查看套餐
     @GetMapping("/dish/{id}")
-
     public R<List<DishDto>> dish(@PathVariable("id") Long SetmealId) {
         LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SetmealDish::getSetmealId, SetmealId);
@@ -172,4 +171,35 @@ public class SetmealController {
 
         return R.success(dishDtos);
     }
+
+    //修改套餐
+    @PutMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
+    public R<String> edit(@RequestBody SetmealDto setmealDto){
+
+        if (setmealDto==null){
+            return R.error("请求异常");
+        }
+
+        if (setmealDto.getSetmealDishes()==null){
+            return R.error("套餐没有菜品,请添加套餐");
+        }
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+        Long setmealId = setmealDto.getId();
+
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId,setmealId);
+        setmealDishService.remove(queryWrapper);
+
+        //为setmeal_dish表填充相关的属性
+        for (SetmealDish setmealDish : setmealDishes) {
+            setmealDish.setSetmealId(setmealId);
+        }
+        //批量把setmealDish保存到setmeal_dish表
+        setmealDishService.saveBatch(setmealDishes);
+        setmealService.updateById(setmealDto);
+
+        return R.success("套餐修改成功");
+    }
+
 }

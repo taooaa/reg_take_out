@@ -75,10 +75,7 @@ public class ShoppingCartController {
     //清空购物车
     @DeleteMapping("/clean")
     public R<String> clean() {
-        LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
-
-        shoppingCartService.remove(queryWrapper);
+        shoppingCartService.clean();
         return R.success("清空购物车成功");
     }
 

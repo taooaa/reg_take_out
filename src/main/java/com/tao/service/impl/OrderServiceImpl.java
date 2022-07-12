@@ -75,7 +75,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
             return orderDetail;
         }).collect(Collectors.toList());
 
-        orders.setNumber(String.valueOf(orderId));
+        orders.setId(orderId);
         orders.setOrderTime(LocalDateTime.now());
         orders.setCheckoutTime(LocalDateTime.now());
         orders.setStatus(2);
